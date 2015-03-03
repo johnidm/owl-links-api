@@ -1,7 +1,8 @@
 src/github.com
 src/gopkg.in
 
-/pkg/*
-/bin/*
+
+pkg/**/*
+bin/**/*
 
 
