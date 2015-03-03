@@ -34,6 +34,8 @@ go get "github.com/julienschmidt/httprouter"
 | PUT       | /link            | Update specific link|
 | DELETE  | /link/{id}      | Delete specific link |
 
+**Note:** You need send field **api-key** in HTTP Header.
+
 Structure send body method **HTTP - POST**
 ```json
 {  
