@@ -5,85 +5,237 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
-
+	"strconv"
 	"net/http"
+	"io"
+	"io/ioutil"
 )
+
+const ( APIKey = "4B5B8A4948F8AA4FF918A353B5CAE" )
 
 var db = database.OpenDB()
 
 func main() {
+	defer db.Close()
 
 	router := httprouter.New()
 
-	router.GET("/links", GetLinks)
-	router.GET("/link/:id", GetLink)
-	router.DELETE("/link/:id", DeleteLink)
-	router.PUT("/link/", PutLink)
-	router.POST("/link", PostLink)
-
-	defer db.Close()
+	router.GET(		"/links", 		GetLinks)
+	router.GET(		"/link/:id", 	GetLink)
+	router.DELETE(	"/link/:id", 	DeleteLink)
+	router.PUT(		"/link/", 		PutLink)
+	router.POST(	"/link", 		PostLink)
 
 	http.ListenAndServe(":8000", router)
 
-	/*
-		err := CreateLink(db, &Link{1, "www.johni.com", "Web Site", "Meu web site"})
-		if err != nil {
-			panic(err)
-		}
-	*/
-	/*
-				err := database.UpdateLink(db, &database.Link{1, "www.douglas.com", "E-Commerce", "Meu E-Commerce"})
-				if err != nil {
-					panic(err)
-				}
-		dbdb
-	*/
-	/*
-		err := DeleteLink(db, 1)
-		if err != nil {
-			panic(err)
-		}
-	*/
-	/*
-
-
-		fmt.Printf("Total de linhas %d\n", len(links))
-		if len(links) != 0 {
-			fmt.Println(links[0].Url)
-		}
-	*/
-
-	//link, err := GetLink(db, 1)
-	//fmt.Printf("URL", link.Url)
-
 }
 
+
 func GetLinks(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	links, err := database.GetLinks(db)
-	if err != nil {
-		panic(err)
+	
+	if !APIKeyIsValid(w, r) {
+		return
+	}
+	
+	links, err := database.GetLinks(db)	
+	if err != nil {		
+		DefineReturnErrorHttpRequest(
+			w, 
+			err.Error(), 
+			"(GetLinks) - Erro ao executar a função database.GetLinks", 
+			500 )
+		return
 	}
 
-	fmt.Println(links)
-	fmt.Fprint(w, "Lista!\n")
-	js, _ := json.Marshal(links)
+	js, err := json.Marshal(links)
+	if err != nil {
+		DefineReturnErrorHttpRequest(
+			w, 
+			err.Error(), 
+			"(GetLinks) - Erro ao fazer o marshal dos links", 
+			500 )
+		return
+	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(js)
 }
 
 func PutLink(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Fprint(w, "Update!\n")
+	
+	if !APIKeyIsValid(w, r) {
+		return
+	}
+
+	var link database.Link
+
+	defer r.Body.Close()
+    body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+    if err != nil {
+        DefineReturnErrorHttpRequest(
+        	w, 
+        	err.Error(), 
+        	"(PutLink) - Erro ao ler o conteúdo da requisição", 
+        	500 )
+        return
+    }	  
+
+    if err := json.Unmarshal(body, &link); err != nil {
+        DefineReturnErrorHttpRequest(
+        	w, 
+        	err.Error(), 
+        	"(PutLink) - Erro ao fazer unmarshal do conteúdo da requisição", 
+        	422)
+        return
+    }
+
+    err = database.UpdateLink(db, &link)
+    if err != nil {		
+		DefineReturnErrorHttpRequest(
+			w, 
+			err.Error(), 
+			"(PutLink) - Erro ao executar a função database.PutLink", 
+			500 )
+		return
+	}
 }
 
 func PostLink(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Fprint(w, "Save!\n")
+	
+	if !APIKeyIsValid(w, r) {
+		return
+	}
+
+  	var link database.Link
+
+    defer r.Body.Close()
+    body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+    if err != nil {
+        DefineReturnErrorHttpRequest(
+        	w, 
+        	err.Error(), 
+        	"(PostLink) - Erro ao ler o conteúdo da requisição", 
+        	500 )
+        return
+    }
+    
+
+    if err := json.Unmarshal(body, &link); err != nil {
+        DefineReturnErrorHttpRequest(
+        	w, 
+        	err.Error(), 
+        	"(PostLink) - Erro ao fazer unmarshal do conteúdo da requisição", 
+        	422)
+        return
+    }
+
+    err = database.CreateLink(db, &link)
+    if err != nil {		
+		DefineReturnErrorHttpRequest(
+			w, 
+			err.Error(), 
+			"(PostLink) - Erro ao executar a função database.PostLink", 
+			500 )
+		return
+	}
+
+    w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+    w.WriteHeader(http.StatusCreated)
+
+    
 }
 
 func GetLink(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	fmt.Fprintf(w, "Get, %s!\n", p.ByName("id"))
+	
+	if !APIKeyIsValid(w, r) {
+		return
+	}
+
+	id, err := strconv.ParseInt(p.ByName("id"), 0, 64)
+	if err != nil {		
+		DefineReturnErrorHttpRequest(
+			w, 
+			err.Error(), 
+			"Informe um \"id\" correto para excluir o registro", 
+			500 )
+		return
+	}	
+
+	link, err := database.GetLink(db, id)	
+	if err != nil {
+		DefineReturnErrorHttpRequest(
+			w, 
+			err.Error(), 
+			"(GetLink) - Erro ao executar a função database.GetLink", 
+			500 )	
+		
+		return
+	}
+
+	js, err := json.Marshal(link)
+	if err != nil {
+		DefineReturnErrorHttpRequest(
+        	w, 
+        	err.Error(), 
+        	"(GetLink) - Erro ao fazer marshal do conteúdo da requisição", 
+        	422)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Write(js)
+
+	fmt.Fprintf(w, "Get, %s!\n", )
 }
 
 func DeleteLink(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	fmt.Fprintf(w, "Delete, %s!\n", p.ByName("id"))
+	
+	if !APIKeyIsValid(w, r) {
+		return
+	}
+
+	id, err := strconv.ParseInt(p.ByName("id"), 0, 64)
+	if err != nil {		
+		DefineReturnErrorHttpRequest(
+			w, 
+			err.Error(), 
+			"Informe um \"id\" correto para excluir o registro", 
+			500 )
+		return
+	}	
+
+	err = database.DeleteLink(db, id)	
+	if err != nil {		
+		DefineReturnErrorHttpRequest(
+			w, 
+			err.Error(), 
+			"(DeleteLink) - Erro ao executar a função database.DeleteLink", 
+			500 )
+		return
+	}	
+		
+}
+
+func APIKeyIsValid(w http.ResponseWriter, r *http.Request) bool {
+
+	if (r.Header.Get("api-key")) != APIKey {
+		DefineReturnErrorHttpRequest(
+			w, 
+			"API Key inválida ou não informada", 
+			"Verifique o valor da chave api-key do cabeçalho da requisição",
+		http.StatusUnauthorized)			
+		return false
+	}
+
+	return true
+}
+
+func DefineReturnErrorHttpRequest(w http.ResponseWriter, e string, es string, s int) {
+	
+	js, _ := json.Marshal( map[string]string{"error": e, "sugestion": es} )	
+	
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(s)
+	w.Write(js)
+
 }

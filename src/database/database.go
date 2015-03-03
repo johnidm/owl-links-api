@@ -2,6 +2,7 @@ package database
 
 import (
 	"gopkg.in/pg.v3"
+	"fmt"
 )
 
 const (
@@ -17,6 +18,7 @@ type Link struct {
 	Url         string `json:"url"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
+	Signedup	string `json:"signedup"`
 }
 
 type Links []*Link
@@ -28,7 +30,10 @@ func (links *Links) New() interface{} {
 }
 
 func CreateLink(db *pg.DB, link *Link) error {
-	_, err := db.ExecOne(`INSERT INTO link(id, url, title, description, signedup) VALUES (?id, ?url, ?title, ?description, current_timestamp)`, link)
+
+	fmt.Println(link)
+
+	_, err := db.ExecOne(`INSERT INTO link(id, url, title, description, signedup) VALUES (nextval('link_seq'), ?url, ?title, ?description, current_timestamp)`, link)
 	return err
 }
 
@@ -44,7 +49,7 @@ func UpdateLink(db *pg.DB, link *Link) error {
 
 func GetLinks(db *pg.DB) (Links, error) {
 	var links Links
-	_, err := db.Query(&links, `SELECT id, url, title, description FROM link`)
+	_, err := db.Query(&links, `SELECT id, url, title, description, signedup FROM link`)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +58,7 @@ func GetLinks(db *pg.DB) (Links, error) {
 
 func GetLink(db *pg.DB, id int64) (*Link, error) {
 	link := &Link{}
-	_, err := db.QueryOne(link, `SELECT id, url, title, description FROM link WHERE id = ?`, id)
+	_, err := db.QueryOne(link, `SELECT id, url, title, description, signedup FROM link WHERE id = ?`, id)
 
 	return link, err
 }
