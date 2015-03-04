@@ -33,8 +33,6 @@ go run src/github.com/johnidm/owl-links-api/service.go
 
 Access `http://localhost:8000`
 
-####API published in Heroku
-Access `https://owl-links-api.herokuapp.com/`
 
 ####Methods
 
