@@ -1,23 +1,20 @@
 #API CRUD Owl Links
 
 #### Setup project
-```bash
-git clone https://github.com/johnidm/owl-links-api
-```
 
+You need to define Go root path.
 ```bash
-cd owl-links-api
-mkdir pkg bin
-```
-
-```bash
-export GOPATH=/home/johni/Projetos/owl-links-api
+export GOPATH=$HOME/go/owl-links-api
 export GOBIN=$GOPATH/bin
 export PATH=$PATH:$GOPATH/src
-
 ```
+> You can to choose directory your preference. In my case I choose `$HOME/go/owl-links-api`.
 
-> Git clone my project in path `/home/johni/Projetos/owl-links-api`
+Create folders in Go root
+```bash
+cd $GOPATH
+mkdir pkg bin src
+```
 
 ####Dependences
 
