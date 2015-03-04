@@ -1,5 +1,7 @@
 #API CRUD Owl Links
 
+##Written in [Go lang](https://golang.org/)
+
 #### Setup project
 
 You need to define Go root path.
@@ -21,7 +23,7 @@ mkdir pkg bin src
 ```bash
 go get "gopkg.in/pg.v3"
 go get "github.com/julienschmidt/httprouter"
-go get github.com/johnidm/owl-links-api/
+go get "github.com/johnidm/owl-links-api"
 ```
 
 ####Run project
