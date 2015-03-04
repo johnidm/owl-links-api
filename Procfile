@@ -1,1 +1,1 @@
-web: ./owl-links-api -port 
+web: owl-links-api -port=$PORT 
