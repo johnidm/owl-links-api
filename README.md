@@ -11,8 +11,9 @@ mkdir pkg bin
 ```
 
 ```bash
-export GOPATH=<your path git clone project>
-export PATH=$PATH:$GOPATH/bin
+export GOPATH=/home/johni/Projetos/owl-links-api>
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:$GOPATH/src
 ```
 
 > Git clone my project in path `/home/johni/Projetos/owl-links-api`

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./database"
+	"github.com/johnidm/owl-links-api/database"
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
