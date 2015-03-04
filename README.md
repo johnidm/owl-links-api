@@ -6,7 +6,7 @@ You need to define Go root path.
 ```bash
 export GOPATH=$HOME/go/owl-links-api
 export GOBIN=$GOPATH/bin
-export PATH=$PATH:$GOPATH/src
+export PATH=$PATH:$GOBIN
 ```
 > You can to choose directory your preference. In my case I choose `$HOME/go/owl-links-api`.
 
