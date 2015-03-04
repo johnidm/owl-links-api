@@ -21,7 +21,15 @@ mkdir pkg bin src
 ```bash
 go get "gopkg.in/pg.v3"
 go get "github.com/julienschmidt/httprouter"
+go get github.com/johnidm/owl-links-api/
 ```
+
+####Run project
+```bash
+go run src/github.com/johnidm/owl-links-api/service.go
+```
+
+Access `http://localhost:8000/`
 
 ####Methods
 
