@@ -114,6 +114,7 @@ Structure send body method **HTTP - POST**
 ```
 Structure send body method **HTTP - PUT**
 `http://owl-links-api.herokuapp.com/link`
+
 ```json
 {  
    "_id":"54fb0ea0e4b024839a01be80",
@@ -128,8 +129,7 @@ Structure send body method **HTTP - PUT**
 }
 ```
 
-Structure method **HTTP - DELETE** specific links
-`http://owl-links-api.herokuapp.com/link/{_id}`
+Structure method **HTTP - DELETE** specific links `http://owl-links-api.herokuapp.com/link/{_id}`
 
 
 
