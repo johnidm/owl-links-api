@@ -38,6 +38,8 @@ Heroku `http://owl-links-api.herokuapp.com/`
 
 ####Methods
 
+**Note:** You need send field **api-key** in HTTP Header.
+
 | HTTP Verb | Path (URL)| Description
 |-----------|----------------------|----------------------------|
 | GET       | /links               | Get all links              |
@@ -52,8 +54,6 @@ Heroku `http://owl-links-api.herokuapp.com/`
 | DELETE    | /collectlink/{id}    | Delete specific collectlink|
 | GET       | /newslatters         | Get all newslatters        |
 | DELETE    | /newslatter/{id}     | Delete specific newslatter |
-
-**Note:** You need send field **api-key** in HTTP Header.
 
 Structure send body method **HTTP - POST**
 ```json
