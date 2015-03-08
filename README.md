@@ -55,54 +55,72 @@ Heroku `http://owl-links-api.herokuapp.com/`
 | GET       | /newslatters         | Get all newslatters        |
 | DELETE    | /newslatter/{id}     | Delete specific newslatter |
 
-Structure send body method **HTTP - POST**
+####Example methods
+
+Structure result body method **HTTP - GET** all links (return one or many records) `http://owl-links-api.herokuapp.com/links`
+```json
+[  
+   {  
+      "id":"p5o4ia0e4b024839a0458yu",
+      "url":"www.douglas.com",
+      "title":"E-Commerce",
+      "description":"My E-Commerce",
+      "signedup":"2015-03-02 23:16:25.846983",
+      "tags" : ["PHP", "MySQL", "Go", "Java"]
+   },
+   {  
+      "id":"54fb0ea0e4b024839a01be80",
+      "url":"www.johni.com",
+      "title":"Blog",
+      "description":"My Blog",
+      "signedup":"2015-03-03 16:37:26.432123",
+      "tags" : ["Linux", "Delphi", "HTML"]
+   }
+]
+```
+
+Structure result body method **HTTP - GET** specific links `http://owl-links-api.herokuapp.com/link/{_id}`
+
+```json
+{  
+   "id":"54fb0ea0e4b024839a01be80",
+   "url":"www.douglas.com",
+   "title":"E-Commerce",
+   "description":"Meu E-Commerce",
+   "signedup":"2015-03-02 23:16:25.846983",
+   "tags": [
+        "PHP",
+        "Scala",
+        "Java"
+    ]
+}
+```
+
+Structure send body method **HTTP - POST**  `http://owl-links-api.herokuapp.com/link`
 ```json
 {  
    "url":"www.douglas.com",
    "title":"E-Commerce",
    "description":"Meu E-Commerce"
+   "tags": [
+        "Go",
+        "MySQL",
+        "Delphi"
+    ]
 }
 ```
-Structure send body method **HTTP - PUT**
+Structure send body method **HTTP - PUT** `http://owl-links-api.herokuapp.com/link`
 ```json
 {  
-   "id":1,
+   "id":"54fb0ea0e4b024839a01be80",
    "url":"www.douglas.com",
    "title":"E-Commerce",
    "description":"Meu E-Commerce",
-
-}
-```
-
-Structure result body method **HTTP - GET** all links (return one or many records)
-```json
-[  
-   {  
-      "id":1,
-      "url":"www.douglas.com",
-      "title":"E-Commerce",
-      "description":"My E-Commerce",
-      "signedup":"2015-03-02 23:16:25.846983"
-   },
-   {  
-      "id":2,
-      "url":"www.johni.com",
-      "title":"Blog",
-      "description":"My Blog",
-      "signedup":"2015-03-03 16:37:26.432123"
-   }
-]
-```
-
-Structure result body method **HTTP - GET** specific links
-
-```json
-{  
-   "id":1,
-   "url":"www.douglas.com",
-   "title":"E-Commerce",
-   "description":"Meu E-Commerce",
-   "signedup":"2015-03-02 23:16:25.846983"
+   "tags": [
+        "PHP",
+        "Scala",
+        "Java"
+    ]
 }
 ```
 
