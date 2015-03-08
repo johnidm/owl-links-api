@@ -1,5 +1,7 @@
 #API CRUD Owl Links
 
+###Written in [Go lang](https://golang.org/)
+
 #### Setup project
 
 You need to define Go root path.
@@ -21,8 +23,12 @@ mkdir pkg bin src
 ```bash
 go get "gopkg.in/pg.v3"
 go get "github.com/julienschmidt/httprouter"
+<<<<<<< HEAD
 go get "gopkg.in/mgo.v2"
 go get "github.com/johnidm/owl-links-api/"
+=======
+go get "github.com/johnidm/owl-links-api"
+>>>>>>> 0246fb1a3fdb0bc82562a073c239c3c3b186b92f
 ```
 
 ####Run project
@@ -32,8 +38,6 @@ go run src/github.com/johnidm/owl-links-api/service.go
 
 Access `http://localhost:8000`
 
-####API published in Heroku
-Access `https://owl-links-api.herokuapp.com/`
 
 
 
