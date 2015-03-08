@@ -128,7 +128,8 @@ Structure send body method **HTTP - PUT**
 }
 ```
 
-
+Structure method **HTTP - DELETE** specific links
+`http://owl-links-api.herokuapp.com/link/{_id}`
 
 
 
