@@ -2,29 +2,39 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/johnidm/owl-links-api/database"
-	"github.com/julienschmidt/httprouter"
-	"io"
-	"io/ioutil"
+	"github.com/johnidm/owl-links-api/database"	
+	"github.com/johnidm/owl-links-api/controllers"
+	"github.com/johnidm/owl-links-api/utils"	
+	"github.com/julienschmidt/httprouter"	
 	"net/http"
 	"strconv"
 	"flag"
 	"log"
-)
-
-const (
-	APIKey = "4B5B8A4948F8AA4FF918A353B5CAE"
+	"errors"
+	"io"
+  	"io/ioutil"
+  	"gopkg.in/mgo.v2"
+//  	"fmt" 
 )
 
 var db = database.OpenDB()
+
+var collecttion *mgo.Collection
 
 func main() {
 
 	port := flag.String("port", "8000", "HTTP Port")
 	flag.Parse()
 
+	sess, err := controllers.Connect()
+	if err != nil {
+		panic(err)
+	}
+
+	collecttion = sess.DB("owl-links").C("links")
+
 	defer db.Close()
+	defer sess.Close()
 
 	router := httprouter.New()
 
@@ -36,220 +46,310 @@ func main() {
 	router.PUT("/link/", PutLink)
 	router.POST("/link", PostLink)
 
+	router.GET("/contacts", GetContacts)
+	router.GET("/contact/:id", GetContact)
+	router.DELETE("/contact/:id", DeleteContact)
+
+	router.GET("/collectlinks", GetCollectlinks)	
+	router.DELETE("/collectlink/:id", DeleteCollectlink)
+
+	router.GET("/newslatters", GetNewslatters)	
+	router.DELETE("/newslatter/:id", DeleteNewslatter)
+
 	log.Println("Stating Server on ", *port)
-
 	log.Fatal(http.ListenAndServe(":" + *port, router))
-
 }
 
 func RunProject(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
 	w.Header().Set("Content-Type", "text/html;charset=utf-8")
 	w.Write([]byte("<h2><font color=\"green\">Owl Link API is running!</font></h2>"))
 }
-
+    
 func GetLinks(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
-	if !APIKeyIsValid(w, r) {
+	if !utils.APIKeyIsValid(w, r) {
 		return
 	}
-
-	links, err := database.GetLinks(db)
+		
+	links, err := controllers.GetLinks(collecttion)
 	if err != nil {
-		DefineReturnErrorHttpRequest(
-			w,
-			err.Error(),
-			"(GetLinks) - Erro ao executar a função database.GetLinks",
-			500)
+		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.GetLinks")
 		return
 	}
 
 	js, err := json.Marshal(links)
 	if err != nil {
-		DefineReturnErrorHttpRequest(
-			w,
-			err.Error(),
-			"(GetLinks) - Erro ao fazer o marshal dos links",
-			500)
+		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal dos links",)		
 		return
-	}
+	}	
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Write(js)
+	utils.WriteJson(w, js)	
 }
 
 func PutLink(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
-	if !APIKeyIsValid(w, r) {
+	if !utils.APIKeyIsValid(w, r) {
 		return
 	}
-
-	var link database.Link
 
 	defer r.Body.Close()
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
-	if err != nil {
-		DefineReturnErrorHttpRequest(
-			w,
-			err.Error(),
-			"(PutLink) - Erro ao ler o conteúdo da requisição",
-			500)
+    body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+    if err != nil {            
+      utils.DefineReturnRequestError(w, err, "Falha ao ler os dados da requisição")	
+      return
+    }
+
+    var link controllers.Link
+
+    if err := json.Unmarshal(body, &link); err != nil {
+      utils.DefineReturnRequestError(w, err, "Falha fazer unmarshal dos dados da requisição")
+      return	
+    }
+
+    err = controllers.UpdateLink(&link, collecttion)
+    if err != nil {		
+		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.UpdateLink")
 		return
 	}
 
-	if err := json.Unmarshal(body, &link); err != nil {
-		DefineReturnErrorHttpRequest(
-			w,
-			err.Error(),
-			"(PutLink) - Erro ao fazer unmarshal do conteúdo da requisição",
-			422)
-		return
-	}
-
-	err = database.UpdateLink(db, &link)
-	if err != nil {
-		DefineReturnErrorHttpRequest(
-			w,
-			err.Error(),
-			"(PutLink) - Erro ao executar a função database.PutLink",
-			500)
-		return
-	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func PostLink(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
-	if !APIKeyIsValid(w, r) {
+	if !utils.APIKeyIsValid(w, r) {
 		return
 	}
-
-	var link database.Link
 
 	defer r.Body.Close()
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
-	if err != nil {
-		DefineReturnErrorHttpRequest(
-			w,
-			err.Error(),
-			"(PostLink) - Erro ao ler o conteúdo da requisição",
-			500)
+    body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+    if err != nil {            
+      utils.DefineReturnRequestError(w, err, "Falha ao ler os dados da requisição")	
+      return
+    }
+
+    var link controllers.Link
+
+    if err := json.Unmarshal(body, &link); err != nil {
+      utils.DefineReturnRequestError(w, err, "Falha fazer unmarshal dos dados da requisição")
+      return	
+    }
+
+    err = controllers.CreateLink(&link, collecttion)
+    if err != nil {		
+		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.CreateLink")
 		return
 	}
-
-	if err := json.Unmarshal(body, &link); err != nil {
-		DefineReturnErrorHttpRequest(
-			w,
-			err.Error(),
-			"(PostLink) - Erro ao fazer unmarshal do conteúdo da requisição",
-			422)
-		return
-	}
-
-	err = database.CreateLink(db, &link)
-	if err != nil {
-		DefineReturnErrorHttpRequest(
-			w,
-			err.Error(),
-			"(PostLink) - Erro ao executar a função database.PostLink",
-			500)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		
 	w.WriteHeader(http.StatusCreated)
 
 }
 
 func GetLink(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
-	if !APIKeyIsValid(w, r) {
+	if !utils.APIKeyIsValid(w, r) {
 		return
 	}
-
-	id, err := strconv.ParseInt(p.ByName("id"), 0, 64)
-	if err != nil {
-		DefineReturnErrorHttpRequest(
-			w,
-			err.Error(),
-			"Informe um \"id\" correto para excluir o registro",
-			500)
+		
+	_id := p.ByName("id")
+	if _id == "" {
+		utils.DefineReturnRequestIdInvalid(w, errors.New("Id is blank"))	
 		return
 	}
+	
 
-	link, err := database.GetLink(db, id)
-	if err != nil {
-		DefineReturnErrorHttpRequest(
-			w,
-			err.Error(),
-			"(GetLink) - Erro ao executar a função database.GetLink",
-			500)
-
+	link, err := controllers.GetLink(_id, collecttion)
+	if err != nil {		
+		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.GetLink")
 		return
 	}
 
 	js, err := json.Marshal(link)
 	if err != nil {
-		DefineReturnErrorHttpRequest(
-			w,
-			err.Error(),
-			"(GetLink) - Erro ao fazer marshal do conteúdo da requisição",
-			422)
+		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal do link")					
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Write(js)
-
-	fmt.Fprintf(w, "Get, %s!\n")
+	utils.WriteJson(w, js)
+	
 }
 
 func DeleteLink(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
-	if !APIKeyIsValid(w, r) {
+	if !utils.APIKeyIsValid(w, r) {
+		return
+	}
+
+	_id := p.ByName("id")
+	if _id == "" {
+		utils.DefineReturnRequestIdInvalid(w, errors.New("Id is blank"))	
+		return
+	}
+
+	err := controllers.DeleteLink(_id, collecttion)
+	if err != nil {
+		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.DeleteLink")
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	
+}
+
+func GetContacts(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	if !utils.APIKeyIsValid(w, r) {
+		return
+	}
+	
+	contacts, err := controllers.GetContacts(db)
+	if err != nil {
+		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.GetContacts")
+		return
+	}
+
+	js, err := json.Marshal(contacts)
+	if err != nil {
+		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal dos contatos",)		
+		return
+	}	
+
+	utils.WriteJson(w, js)
+}
+
+func GetContact(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	if !utils.APIKeyIsValid(w, r) {
 		return
 	}
 
 	id, err := strconv.ParseInt(p.ByName("id"), 0, 64)
 	if err != nil {
-		DefineReturnErrorHttpRequest(
-			w,
-			err.Error(),
-			"Informe um \"id\" correto para excluir o registro",
-			500)
+		utils.DefineReturnRequestIdInvalid(w, err)	
 		return
 	}
 
-	err = database.DeleteLink(db, id)
+	contact, err := controllers.GetContact(db, id)
+	if err != nil {		
+		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.GetContact")
+		return
+	}
+
+	js, err := json.Marshal(contact)
 	if err != nil {
-		DefineReturnErrorHttpRequest(
-			w,
-			err.Error(),
-			"(DeleteLink) - Erro ao executar a função database.DeleteLink",
-			500)
+		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal do contato")					
 		return
 	}
 
+	utils.WriteJson(w, js)
 }
 
-func APIKeyIsValid(w http.ResponseWriter, r *http.Request) bool {
 
-	if (r.Header.Get("api-key")) != APIKey {
-		DefineReturnErrorHttpRequest(
-			w,
-			"API Key inválida ou não informada",
-			"Verifique o valor da chave api-key do cabeçalho da requisição",
-			http.StatusUnauthorized)
-		return false
+func DeleteContact(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	
+	if !utils.APIKeyIsValid(w, r) {
+		return
+	}	
+
+	id, err := strconv.ParseInt(p.ByName("id"), 0, 64)
+	if err != nil {
+		utils.DefineReturnRequestIdInvalid(w, err)
+		return
 	}
 
-	return true
+	err = controllers.DeleteContact(db, id)
+	if err != nil {
+		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.DeleteContact")
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
-func DefineReturnErrorHttpRequest(w http.ResponseWriter, e string, es string, s int) {
+func GetCollectlinks(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
-	js, _ := json.Marshal(map[string]string{"error": e, "sugestion": es})
+	if !utils.APIKeyIsValid(w, r) {
+		return
+	}
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(s)
-	w.Write(js)
+	collectlinks, err := controllers.GetCollectlinks(db)
+	if err != nil {
+		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.GetCollectlinks")
+		return
+	}
+
+	js, err := json.Marshal(collectlinks)
+	if err != nil {
+		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal das sugestões de link",)		
+		return
+	}	
+
+	utils.WriteJson(w, js)
 
 }
+
+func DeleteCollectlink(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+
+	if !utils.APIKeyIsValid(w, r) {
+		return
+	}
+
+	id, err := strconv.ParseInt(p.ByName("id"), 0, 64)
+	if err != nil {
+		utils.DefineReturnRequestIdInvalid(w, err)
+		return
+	}
+
+	err = controllers.DeleteCollectlink(db, id)
+	if err != nil {
+		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.DeleteCollectlink")
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+
+}
+
+
+func GetNewslatters(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
+	if !utils.APIKeyIsValid(w, r) {
+		return
+	}
+
+	newslatters, err := controllers.GetNewslatters(db)
+	if err != nil {
+		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.GetNewslatters")
+		return
+	}
+
+	js, err := json.Marshal(newslatters)
+	if err != nil {
+		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal das assinaturas de newslatters",)		
+		return
+	}	
+
+	utils.WriteJson(w, js)
+}
+
+func DeleteNewslatter(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+
+	if !utils.APIKeyIsValid(w, r) {
+		return
+	}
+
+	id, err := strconv.ParseInt(p.ByName("id"), 0, 64)
+	if err != nil {
+		utils.DefineReturnRequestIdInvalid(w, err)
+		return
+	}
+
+	err = controllers.DeleteNewslatter(db, id)
+	if err != nil {
+		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.DeleteNewslatter")
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+
+}
+
