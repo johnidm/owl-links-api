@@ -57,8 +57,10 @@ Heroku `http://owl-links-api.herokuapp.com/`
 
 ####Example methods
 
-Structure result body method **HTTP - GET** all links (return one or many records) 
+Structure result body method **HTTP - GET** all links (return one or many records)
+
 `http://owl-links-api.herokuapp.com/links`
+
 ```json
 [  
    {  
@@ -81,6 +83,7 @@ Structure result body method **HTTP - GET** all links (return one or many record
 ```
 
 Structure result body method **HTTP - GET** specific links
+
 `http://owl-links-api.herokuapp.com/link/{_id}`
 
 ```json
@@ -99,7 +102,9 @@ Structure result body method **HTTP - GET** specific links
 ```
 
 Structure send body method **HTTP - POST**  
+
 `http://owl-links-api.herokuapp.com/link`
+
 ```json
 {  
    "url":"www.douglas.com",
@@ -113,6 +118,7 @@ Structure send body method **HTTP - POST**
 }
 ```
 Structure send body method **HTTP - PUT**
+
 `http://owl-links-api.herokuapp.com/link`
 
 ```json
