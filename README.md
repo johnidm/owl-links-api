@@ -57,11 +57,12 @@ Heroku `http://owl-links-api.herokuapp.com/`
 
 ####Example methods
 
-Structure result body method **HTTP - GET** all links (return one or many records) `http://owl-links-api.herokuapp.com/links`
+Structure result body method **HTTP - GET** all links (return one or many records) 
+`http://owl-links-api.herokuapp.com/links`
 ```json
 [  
    {  
-      "id":"p5o4ia0e4b024839a0458yu",
+      "_id":"p5o4ia0e4b024839a0458yu",
       "url":"www.douglas.com",
       "title":"E-Commerce",
       "description":"My E-Commerce",
@@ -69,7 +70,7 @@ Structure result body method **HTTP - GET** all links (return one or many record
       "tags" : ["PHP", "MySQL", "Go", "Java"]
    },
    {  
-      "id":"54fb0ea0e4b024839a01be80",
+      "_id":"54fb0ea0e4b024839a01be80",
       "url":"www.johni.com",
       "title":"Blog",
       "description":"My Blog",
@@ -79,11 +80,12 @@ Structure result body method **HTTP - GET** all links (return one or many record
 ]
 ```
 
-Structure result body method **HTTP - GET** specific links `http://owl-links-api.herokuapp.com/link/{_id}`
+Structure result body method **HTTP - GET** specific links
+`http://owl-links-api.herokuapp.com/link/{_id}`
 
 ```json
 {  
-   "id":"54fb0ea0e4b024839a01be80",
+   "_id":"54fb0ea0e4b024839a01be80",
    "url":"www.douglas.com",
    "title":"E-Commerce",
    "description":"Meu E-Commerce",
@@ -96,7 +98,8 @@ Structure result body method **HTTP - GET** specific links `http://owl-links-api
 }
 ```
 
-Structure send body method **HTTP - POST**  `http://owl-links-api.herokuapp.com/link`
+Structure send body method **HTTP - POST**  
+`http://owl-links-api.herokuapp.com/link`
 ```json
 {  
    "url":"www.douglas.com",
@@ -109,10 +112,11 @@ Structure send body method **HTTP - POST**  `http://owl-links-api.herokuapp.com/
     ]
 }
 ```
-Structure send body method **HTTP - PUT** `http://owl-links-api.herokuapp.com/link`
+Structure send body method **HTTP - PUT**
+`http://owl-links-api.herokuapp.com/link`
 ```json
 {  
-   "id":"54fb0ea0e4b024839a01be80",
+   "_id":"54fb0ea0e4b024839a01be80",
    "url":"www.douglas.com",
    "title":"E-Commerce",
    "description":"Meu E-Commerce",
