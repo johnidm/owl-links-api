@@ -23,12 +23,8 @@ mkdir pkg bin src
 ```bash
 go get "gopkg.in/pg.v3"
 go get "github.com/julienschmidt/httprouter"
-<<<<<<< HEAD
 go get "gopkg.in/mgo.v2"
 go get "github.com/johnidm/owl-links-api/"
-=======
-go get "github.com/johnidm/owl-links-api"
->>>>>>> 0246fb1a3fdb0bc82562a073c239c3c3b186b92f
 ```
 
 ####Run project
@@ -38,34 +34,19 @@ go run src/github.com/johnidm/owl-links-api/service.go
 
 Access `http://localhost:8000`
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Heroku `http://owl-links-api.herokuapp.com/`
 
 ####Methods
 
 | HTTP Verb | Path (URL)| Description
-|-----------|------------------|-----------------
-| GET       | /links           | Get all links|
-| GET       | /link/{id}      |Get specific link|
-| POST     | /link            | Insert new link|
-| PUT       | /link            | Update specific link|
-| DELETE  | /link/{id}      | Delete specific link |
+|-----------|------------------|-----------------------|
+| GET       | /links           | Get all links         |
+| GET       | /link/{id}       | Get specific link     |
+| POST      | /link            | Insert new link       |
+| PUT       | /link            | Update specific link  |
+| DELETE    | /link/{id}       | Delete specific link  |
+
+
 
 **Note:** You need send field **api-key** in HTTP Header.
 
