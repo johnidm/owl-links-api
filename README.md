@@ -104,7 +104,7 @@ Structure send body method **HTTP - POST**
 {  
    "url":"www.douglas.com",
    "title":"E-Commerce",
-   "description":"Meu E-Commerce"
+   "description":"Meu E-Commerce",
    "tags": [
         "Go",
         "MySQL",
