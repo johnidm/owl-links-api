@@ -74,7 +74,7 @@ func GetLinks(C *mgo.Collection) (Links, error) {
 
     var links Links
 
-    err := C.Find(bson.M{}).One(&links)
+    err := C.Find(bson.M{}).All(&links)
     if err != nil {
       return nil, err 
     }  
