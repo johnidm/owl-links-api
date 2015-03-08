@@ -39,12 +39,25 @@ Heroku `http://owl-links-api.herokuapp.com/`
 ####Methods
 
 | HTTP Verb | Path (URL)| Description
-|-----------|------------------|-----------------------|
-| GET       | /links           | Get all links         |
-| GET       | /link/{id}       | Get specific link     |
-| POST      | /link            | Insert new link       |
-| PUT       | /link            | Update specific link  |
-| DELETE    | /link/{id}       | Delete specific link  |
+|-----------|------------------|------------------------|
+| GET       | /links           | Get all links          |
+| GET       | /link/{id}       | Get specific link      |
+| POST      | /link            | Insert new link        |
+| PUT       | /link            | Update specific link   |
+| DELETE    | /link/{id}       | Delete specific link   |
+| GET       | /contacts        | Get all contacts       |
+| GET       | /contact/{id}    | Get specific contact   |
+| DELETE    | /contact/{id}    | Delete specific contact|
+
+
+
+
+
+	router.GET("/collectlinks", GetCollectlinks)	
+	router.DELETE("/collectlink/:id", DeleteCollectlink)
+
+	router.GET("/newslatters", GetNewslatters)	
+	router.DELETE("/newslatter/:id", DeleteNewslatter)
 
 
 
