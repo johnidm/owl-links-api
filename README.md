@@ -69,7 +69,10 @@ Structure result body method **HTTP - GET** all links (return one or many record
       "title":"E-Commerce",
       "description":"My E-Commerce",
       "signedup":"2015-03-02 23:16:25.846983",
-      "tags" : ["PHP", "MySQL", "Go", "Java"]
+      "tags" : 
+		["PHP", "MySQL", "Go", "Java"],
+      "notifynews" : "S"
+
    },
    {  
       "_id":"54fb0ea0e4b024839a01be80",
@@ -77,7 +80,9 @@ Structure result body method **HTTP - GET** all links (return one or many record
       "title":"Blog",
       "description":"My Blog",
       "signedup":"2015-03-03 16:37:26.432123",
-      "tags" : ["Linux", "Delphi", "HTML"]
+      "tags" : 
+		["Linux", "Delphi", "HTML"],
+      "notifynews" : "S"
    }
 ]
 ```
@@ -97,7 +102,8 @@ Structure result body method **HTTP - GET** specific links
         "PHP",
         "Scala",
         "Java"
-    ]
+    ],
+   "notifynews" : "S"
 }
 ```
 
@@ -115,6 +121,7 @@ Structure send body method **HTTP - POST**
         "MySQL",
         "Delphi"
     ]
+   "notifynews" : "N"
 }
 ```
 Structure send body method **HTTP - PUT**
@@ -132,6 +139,7 @@ Structure send body method **HTTP - PUT**
         "Scala",
         "Java"
     ]
+   "notifynews" : "N"
 }
 ```
 
