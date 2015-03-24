@@ -138,7 +138,7 @@ Structure send body method **HTTP - PUT**
         "PHP",
         "Scala",
         "Java"
-    ]
+    ],
    "notifynews" : "N"
 }
 ```
