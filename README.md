@@ -120,7 +120,7 @@ Structure send body method **HTTP - POST**
         "Go",
         "MySQL",
         "Delphi"
-    ]
+    ],
    "notifynews" : "N"
 }
 ```
