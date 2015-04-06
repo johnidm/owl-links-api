@@ -2,7 +2,7 @@
 
 ## Running http://owl-links-api.herokuapp.com/
 
-###Written in [Go lang](https://golang.org/)
+### Written in [Go lang](https://golang.org/)
 
 #### Setup project
 
@@ -14,7 +14,7 @@ export PATH=$PATH:$GOBIN
 ```
 > You can to choose directory your preference. In my case I choose `$HOME/go/owl-links-api`.
 
-> If not exists `$GOPATH`, you need to create.
+> If not exists `$GOPATH`, you need to create. Run mkdir -p $GOPATH.
 
 Create folders in Go root
 ```bash
