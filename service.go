@@ -2,19 +2,18 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/johnidm/owl-links-api/database"	
+	"errors"
+	"flag"
 	"github.com/johnidm/owl-links-api/controllers"
-	"github.com/johnidm/owl-links-api/utils"	
-	"github.com/julienschmidt/httprouter"	
+	"github.com/johnidm/owl-links-api/database"
+	"github.com/johnidm/owl-links-api/utils"
+	"github.com/julienschmidt/httprouter"
+	"gopkg.in/mgo.v2"
+	"io"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
-	"flag"
-	"log"
-	"errors"
-	"io"
-  	"io/ioutil"
-  	"gopkg.in/mgo.v2"
-//  	"fmt" 
 )
 
 var db = database.OpenDB()
@@ -39,6 +38,9 @@ func main() {
 	router := httprouter.New()
 
 	router.GET("/", RunProject)
+	router.OPTIONS("/*whatever", DefaultRoute)
+
+	router.GET("/test", utils.TestRoute)
 
 	router.GET("/links", GetLinks)
 	router.GET("/link/:id", GetLink)
@@ -50,28 +52,30 @@ func main() {
 	router.GET("/contact/:id", GetContact)
 	router.DELETE("/contact/:id", DeleteContact)
 
-	router.GET("/collectlinks", GetCollectlinks)	
+	router.GET("/collectlinks", GetCollectlinks)
 	router.DELETE("/collectlink/:id", DeleteCollectlink)
 
-	router.GET("/newslatters", GetNewslatters)	
+	router.GET("/newslatters", GetNewslatters)
 	router.DELETE("/newslatter/:id", DeleteNewslatter)
 
 	log.Println("Stating Server on ", *port)
-	log.Fatal(http.ListenAndServe(":" + *port, router))
+
+	log.Fatal(http.ListenAndServe(":"+*port, router))
+
 }
 
 func RunProject(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	w.Header().Set("Content-Type", "text/html;charset=utf-8")
-	w.Write([]byte("<h2><font color=\"green\">Owl Link API is running!</font></h2>"))
+	w.Write([]byte("<h2><font color=\"green\">Owl Link API v.0.9.1 is running!</font></h2>"))
 }
-    
+
 func GetLinks(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	if !utils.APIKeyIsValid(w, r) {
 		return
 	}
-		
+
 	links, err := controllers.GetLinks(collecttion)
 	if err != nil {
 		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.GetLinks")
@@ -80,11 +84,11 @@ func GetLinks(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	js, err := json.Marshal(links)
 	if err != nil {
-		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal dos links",)		
+		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal dos links")
 		return
-	}	
+	}
 
-	utils.WriteJson(w, js)	
+	utils.WriteJson(w, js)
 }
 
 func PutLink(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -94,21 +98,21 @@ func PutLink(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 
 	defer r.Body.Close()
-    body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
-    if err != nil {            
-      utils.DefineReturnRequestError(w, err, "Falha ao ler os dados da requisição")	
-      return
-    }
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	if err != nil {
+		utils.DefineReturnRequestError(w, err, "Falha ao ler os dados da requisição")
+		return
+	}
 
-    var link controllers.Link
+	var link controllers.Link
 
-    if err := json.Unmarshal(body, &link); err != nil {
-      utils.DefineReturnRequestError(w, err, "Falha fazer unmarshal dos dados da requisição")
-      return	
-    }
+	if err := json.Unmarshal(body, &link); err != nil {
+		utils.DefineReturnRequestError(w, err, "Falha fazer unmarshal dos dados da requisição")
+		return
+	}
 
-    err = controllers.UpdateLink(&link, collecttion)
-    if err != nil {		
+	err = controllers.UpdateLink(&link, collecttion)
+	if err != nil {
 		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.UpdateLink")
 		return
 	}
@@ -123,25 +127,25 @@ func PostLink(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 
 	defer r.Body.Close()
-    body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
-    if err != nil {            
-      utils.DefineReturnRequestError(w, err, "Falha ao ler os dados da requisição")	
-      return
-    }
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	if err != nil {
+		utils.DefineReturnRequestError(w, err, "Falha ao ler os dados da requisição")
+		return
+	}
 
-    var link controllers.Link
+	var link controllers.Link
 
-    if err := json.Unmarshal(body, &link); err != nil {
-      utils.DefineReturnRequestError(w, err, "Falha fazer unmarshal dos dados da requisição")
-      return	
-    }
+	if err := json.Unmarshal(body, &link); err != nil {
+		utils.DefineReturnRequestError(w, err, "Falha fazer unmarshal dos dados da requisição")
+		return
+	}
 
-    err = controllers.CreateLink(&link, collecttion)
-    if err != nil {		
+	err = controllers.CreateLink(&link, collecttion)
+	if err != nil {
 		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.CreateLink")
 		return
 	}
-		
+
 	w.WriteHeader(http.StatusCreated)
 
 }
@@ -151,28 +155,27 @@ func GetLink(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	if !utils.APIKeyIsValid(w, r) {
 		return
 	}
-		
+
 	_id := p.ByName("id")
 	if _id == "" {
-		utils.DefineReturnRequestIdInvalid(w, errors.New("Id is blank"))	
+		utils.DefineReturnRequestIdInvalid(w, errors.New("Id is blank"))
 		return
 	}
-	
 
 	link, err := controllers.GetLink(_id, collecttion)
-	if err != nil {		
+	if err != nil {
 		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.GetLink")
 		return
 	}
 
 	js, err := json.Marshal(link)
 	if err != nil {
-		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal do link")					
+		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal do link")
 		return
 	}
 
 	utils.WriteJson(w, js)
-	
+
 }
 
 func DeleteLink(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -183,7 +186,7 @@ func DeleteLink(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	_id := p.ByName("id")
 	if _id == "" {
-		utils.DefineReturnRequestIdInvalid(w, errors.New("Id is blank"))	
+		utils.DefineReturnRequestIdInvalid(w, errors.New("Id is blank"))
 		return
 	}
 
@@ -194,14 +197,14 @@ func DeleteLink(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	
+
 }
 
 func GetContacts(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	if !utils.APIKeyIsValid(w, r) {
 		return
 	}
-	
+
 	contacts, err := controllers.GetContacts(db)
 	if err != nil {
 		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.GetContacts")
@@ -210,9 +213,9 @@ func GetContacts(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	js, err := json.Marshal(contacts)
 	if err != nil {
-		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal dos contatos",)		
+		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal dos contatos")
 		return
-	}	
+	}
 
 	utils.WriteJson(w, js)
 }
@@ -224,31 +227,30 @@ func GetContact(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	id, err := strconv.ParseInt(p.ByName("id"), 0, 64)
 	if err != nil {
-		utils.DefineReturnRequestIdInvalid(w, err)	
+		utils.DefineReturnRequestIdInvalid(w, err)
 		return
 	}
 
 	contact, err := controllers.GetContact(db, id)
-	if err != nil {		
+	if err != nil {
 		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.GetContact")
 		return
 	}
 
 	js, err := json.Marshal(contact)
 	if err != nil {
-		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal do contato")					
+		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal do contato")
 		return
 	}
 
 	utils.WriteJson(w, js)
 }
 
-
 func DeleteContact(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	
+
 	if !utils.APIKeyIsValid(w, r) {
 		return
-	}	
+	}
 
 	id, err := strconv.ParseInt(p.ByName("id"), 0, 64)
 	if err != nil {
@@ -279,9 +281,9 @@ func GetCollectlinks(w http.ResponseWriter, r *http.Request, _ httprouter.Params
 
 	js, err := json.Marshal(collectlinks)
 	if err != nil {
-		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal das sugestões de link",)		
+		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal das sugestões de link")
 		return
-	}	
+	}
 
 	utils.WriteJson(w, js)
 
@@ -309,7 +311,6 @@ func DeleteCollectlink(w http.ResponseWriter, r *http.Request, p httprouter.Para
 
 }
 
-
 func GetNewslatters(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	if !utils.APIKeyIsValid(w, r) {
@@ -324,9 +325,9 @@ func GetNewslatters(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 
 	js, err := json.Marshal(newslatters)
 	if err != nil {
-		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal das assinaturas de newslatters",)		
+		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal das assinaturas de newslatters")
 		return
-	}	
+	}
 
 	utils.WriteJson(w, js)
 }
@@ -352,4 +353,3 @@ func DeleteNewslatter(w http.ResponseWriter, r *http.Request, p httprouter.Param
 	w.WriteHeader(http.StatusOK)
 
 }
-

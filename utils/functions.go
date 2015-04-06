@@ -1,8 +1,10 @@
 package utils
 
 import (
-	"net/http"
 	"encoding/json"
+	"fmt"
+	"github.com/julienschmidt/httprouter"
+	"net/http"
 )
 
 const (
@@ -23,7 +25,6 @@ func APIKeyIsValid(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-
 func DefineReturnErrorHttpRequest(w http.ResponseWriter, e string, es string, s int) {
 
 	js, _ := json.Marshal(map[string]string{"error": e, "sugestion": es})
@@ -39,14 +40,14 @@ func DefineReturnRequestIdInvalid(w http.ResponseWriter, e error) {
 		w,
 		e.Error(),
 		"É necessário um 'id' válido no parâmetro da requisição",
-		500);
+		500)
 }
 
 func DefineReturnRequestFailExecFunc(w http.ResponseWriter, e error, f string) {
 	DefineReturnErrorHttpRequest(
 		w,
 		e.Error(),
-		"Erro ao executar a função " + f,
+		"Erro ao executar a função "+f,
 		500)
 }
 
@@ -61,9 +62,22 @@ func DefineReturnRequestError(w http.ResponseWriter, e error, m string) {
 func WriteJson(w http.ResponseWriter, j []byte) {
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+
 	w.Write(j)
- 	
+	w.WriteHeader(http.StatusOK)
+
 }
 
+func DefaultHeader(w http.ResponseWriter) {
 
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, api-key")
+}
+
+func TestRoute(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
+	DefaultHeader(w)
+
+	w.Write([]byte(r.Method + " executed..."))
+}
