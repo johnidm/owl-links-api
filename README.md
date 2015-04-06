@@ -14,6 +14,8 @@ export PATH=$PATH:$GOBIN
 ```
 > You can to choose directory your preference. In my case I choose `$HOME/go/owl-links-api`.
 
+> If not exists `$GOPATH`, you need to create.
+
 Create folders in Go root
 ```bash
 cd $GOPATH
