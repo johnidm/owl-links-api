@@ -38,7 +38,7 @@ func main() {
 	router := httprouter.New()
 
 	router.GET("/", RunProject)
-	router.OPTIONS("/*whatever", DefaultRoute)
+	router.OPTIONS("/*whatever", utils.DefaultRoute)
 
 	router.GET("/test", utils.TestRoute)
 
@@ -67,7 +67,7 @@ func main() {
 func RunProject(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	w.Header().Set("Content-Type", "text/html;charset=utf-8")
-	w.Write([]byte("<h2><font color=\"green\">Owl Link API v.0.9.1 is running!</font></h2>"))
+	w.Write([]byte("<h2><font color=\"green\">Owl Link API v.0.9.2 is running!</font></h2>"))
 }
 
 func GetLinks(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -88,6 +88,7 @@ func GetLinks(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		return
 	}
 
+	utils.DefaultHeader(w)
 	utils.WriteJson(w, js)
 }
 
@@ -117,6 +118,7 @@ func PutLink(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		return
 	}
 
+	utils.DefaultHeader(w)
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -146,6 +148,7 @@ func PostLink(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		return
 	}
 
+	utils.DefaultHeader(w)
 	w.WriteHeader(http.StatusCreated)
 
 }
@@ -174,6 +177,7 @@ func GetLink(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		return
 	}
 
+	utils.DefaultHeader(w)
 	utils.WriteJson(w, js)
 
 }
@@ -196,11 +200,13 @@ func DeleteLink(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		return
 	}
 
+	utils.DefaultHeader(w)
 	w.WriteHeader(http.StatusOK)
 
 }
 
 func GetContacts(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
 	if !utils.APIKeyIsValid(w, r) {
 		return
 	}
@@ -217,10 +223,12 @@ func GetContacts(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		return
 	}
 
+	utils.DefaultHeader(w)
 	utils.WriteJson(w, js)
 }
 
 func GetContact(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+
 	if !utils.APIKeyIsValid(w, r) {
 		return
 	}
@@ -243,6 +251,7 @@ func GetContact(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		return
 	}
 
+	utils.DefaultHeader(w)
 	utils.WriteJson(w, js)
 }
 
@@ -264,6 +273,7 @@ func DeleteContact(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 		return
 	}
 
+	utils.DefaultHeader(w)
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -285,6 +295,7 @@ func GetCollectlinks(w http.ResponseWriter, r *http.Request, _ httprouter.Params
 		return
 	}
 
+	utils.DefaultHeader(w)
 	utils.WriteJson(w, js)
 
 }
@@ -307,6 +318,7 @@ func DeleteCollectlink(w http.ResponseWriter, r *http.Request, p httprouter.Para
 		return
 	}
 
+	utils.DefaultHeader(w)
 	w.WriteHeader(http.StatusOK)
 
 }
@@ -329,6 +341,7 @@ func GetNewslatters(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 		return
 	}
 
+	utils.DefaultHeader(w)
 	utils.WriteJson(w, js)
 }
 
@@ -350,6 +363,7 @@ func DeleteNewslatter(w http.ResponseWriter, r *http.Request, p httprouter.Param
 		return
 	}
 
+	utils.DefaultHeader(w)
 	w.WriteHeader(http.StatusOK)
 
 }

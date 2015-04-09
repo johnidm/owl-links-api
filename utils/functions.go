@@ -2,7 +2,7 @@ package utils
 
 import (
 	"encoding/json"
-	"fmt"
+
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
@@ -60,12 +60,7 @@ func DefineReturnRequestError(w http.ResponseWriter, e error, m string) {
 }
 
 func WriteJson(w http.ResponseWriter, j []byte) {
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-
 	w.Write(j)
-	w.WriteHeader(http.StatusOK)
-
 }
 
 func DefaultHeader(w http.ResponseWriter) {
@@ -73,6 +68,7 @@ func DefaultHeader(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, api-key")
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
 
 func TestRoute(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -80,4 +76,9 @@ func TestRoute(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	DefaultHeader(w)
 
 	w.Write([]byte(r.Method + " executed..."))
+}
+
+func DefaultRoute(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
+	DefaultHeader(w)
 }
