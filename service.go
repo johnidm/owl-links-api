@@ -67,7 +67,7 @@ func main() {
 func RunProject(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	w.Header().Set("Content-Type", "text/html;charset=utf-8")
-	w.Write([]byte("<h2><font color=\"green\">Owl Link API v.0.9.2 is running!</font></h2>"))
+	w.Write([]byte("<h2><font color=\"green\">Owl Link API v.0.9.3 is running!</font></h2>"))
 }
 
 func GetLinks(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
