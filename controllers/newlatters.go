@@ -4,37 +4,34 @@ import (
 	"gopkg.in/pg.v3"
 )
 
-type Newslatter struct {
-	Id int64 `json:"id"`
-	Name string `json:"name"` 
-	Email string `json:"email"`  	 
-	Subscribe string `json:"subscribe"`  	 
-	Signedup string `json:"signedup"` 
+type Newsletter struct {
+	Id        int64  `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Subscribe string `json:"subscribe"`
+	Signedup  string `json:"signedup"`
 }
 
-type Newslatters []*Newslatter
+type Newsletters []*Newsletter
 
-func (newslatters *Newslatters) New() interface{} {
-	u := &Newslatter{}
-	*newslatters = append(*newslatters, u)
+func (newsletters *Newsletters) New() interface{} {
+	u := &Newsletter{}
+	*newsletters = append(*newsletters, u)
 	return u
 }
 
+func GetNewsletters(db *pg.DB) (Newsletters, error) {
+	var newsletters Newsletters
 
-func GetNewslatters(db *pg.DB) (Newslatters, error) { 
-	var newslatters Newslatters 
-
-	_, err := db.Query(&newslatters, `SELECT id, name, email, subscribe, signedup FROM newslatter`)
+	_, err := db.Query(&newsletters, `SELECT id, name, email, subscribe, signedup FROM newsletter`)
 
 	if err != nil {
 		return nil, err
 	}
-	return newslatters, nil
+	return newsletters, nil
 }
 
-func DeleteNewslatter(db *pg.DB, id int64) error {
-	_, err := db.ExecOne("DELETE FROM newslatter WHERE id = ?", id)
+func DeleteNewsletter(db *pg.DB, id int64) error {
+	_, err := db.ExecOne("DELETE FROM newsletter WHERE id = ?", id)
 	return err
 }
-
-

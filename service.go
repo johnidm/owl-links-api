@@ -55,8 +55,8 @@ func main() {
 	router.GET("/collectlinks", GetCollectlinks)
 	router.DELETE("/collectlink/:id", DeleteCollectlink)
 
-	router.GET("/newslatters", GetNewslatters)
-	router.DELETE("/newslatter/:id", DeleteNewslatter)
+	router.GET("/newsletters", GetNewsletters)
+	router.DELETE("/newsletter/:id", DeleteNewsletter)
 
 	log.Println("Stating Server on ", *port)
 
@@ -323,21 +323,21 @@ func DeleteCollectlink(w http.ResponseWriter, r *http.Request, p httprouter.Para
 
 }
 
-func GetNewslatters(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func GetNewsletters(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	if !utils.APIKeyIsValid(w, r) {
 		return
 	}
 
-	newslatters, err := controllers.GetNewslatters(db)
+	newsletters, err := controllers.GetNewsletters(db)
 	if err != nil {
-		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.GetNewslatters")
+		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.GetNewsletters")
 		return
 	}
 
-	js, err := json.Marshal(newslatters)
+	js, err := json.Marshal(newsletters)
 	if err != nil {
-		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal das assinaturas de newslatters")
+		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal das assinaturas de newsletters")
 		return
 	}
 
@@ -345,7 +345,7 @@ func GetNewslatters(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 	utils.WriteJson(w, js)
 }
 
-func DeleteNewslatter(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func DeleteNewsletter(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	if !utils.APIKeyIsValid(w, r) {
 		return
@@ -357,9 +357,9 @@ func DeleteNewslatter(w http.ResponseWriter, r *http.Request, p httprouter.Param
 		return
 	}
 
-	err = controllers.DeleteNewslatter(db, id)
+	err = controllers.DeleteNewsletter(db, id)
 	if err != nil {
-		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.DeleteNewslatter")
+		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.DeleteNewsletter")
 		return
 	}
 

@@ -56,8 +56,8 @@ Heroku `http://owl-links-api.herokuapp.com/`
 | DELETE    | /contact/{id}        | Delete specific contact    |
 | GET       | /collectlinks        | Get all collectlinks       |
 | DELETE    | /collectlink/{id}    | Delete specific collectlink|
-| GET       | /newslatters         | Get all newslatters        |
-| DELETE    | /newslatter/{id}     | Delete specific newslatter |
+| GET       | /newsletters         | Get all newsletters        |
+| DELETE    | /newsletter/{id}     | Delete specific newsletter |
 
 ####Example methods
 
