@@ -12,15 +12,18 @@ type Newsletter struct {
 	Signedup  string `json:"signedup"`
 }
 
-type Newsletters []*Newsletter
-
-func (newsletters *Newsletters) New() interface{} {
-	u := &Newsletter{}
-	*newsletters = append(*newsletters, u)
-	return u
+type Newsletters struct {
+	C []Newsletter
 }
 
-func GetNewsletters(db *pg.DB) (Newsletters, error) {
+var _ pg.Collection = &Newsletters{}
+
+func (newsletters *Newsletters) NewRecord() interface{} {
+	newsletters.C = append(newsletters.C, Newsletter{})
+	return &newsletters.C[len(newsletters.C)-1]
+}
+
+func GetNewsletters(db *pg.DB) ([]Newsletter, error) {
 	var newsletters Newsletters
 
 	_, err := db.Query(&newsletters, `SELECT id, name, email, subscribe, signedup FROM newsletter`)
@@ -28,7 +31,7 @@ func GetNewsletters(db *pg.DB) (Newsletters, error) {
 	if err != nil {
 		return nil, err
 	}
-	return newsletters, nil
+	return newsletters.C, nil
 }
 
 func DeleteNewsletter(db *pg.DB, id int64) error {
