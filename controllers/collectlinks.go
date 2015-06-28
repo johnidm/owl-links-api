@@ -24,7 +24,7 @@ func (collectlinks *Collectlinks) NewRecord() interface{} {
 func GetCollectlinks(db *pg.DB) ([]Collectlink, error) {
 	var collectlinks Collectlinks
 
-	_, err := db.Query(&collectlinks, `SELECT id, link, signedup FROM collectlink`)
+	_, err := db.Query(&collectlinks, `SELECT id, link, signedup FROM collectlink order by id desc`)
 
 	return collectlinks.C, err
 }

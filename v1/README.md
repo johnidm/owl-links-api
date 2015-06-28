@@ -16,7 +16,7 @@ cd $GOPATH
 mkdir pkg bin src
 ```
 
-####Dependences
+#### Dependences
 
 ```bash
 go get "gopkg.in/pg.v3"
@@ -24,7 +24,12 @@ go get "github.com/julienschmidt/httprouter"
 go get github.com/johnidm/owl-links-api/
 ```
 
-####Run project
+#### Update all packages 
+```bash
+go get -u
+```
+
+#### Run project
 ```bash
 go run src/github.com/johnidm/owl-links-api/service.go
 ```

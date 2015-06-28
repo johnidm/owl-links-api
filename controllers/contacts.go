@@ -35,7 +35,7 @@ func (contactsclean *ContactsClean) NewRecord() interface{} {
 func GetContacts(db *pg.DB) ([]ContactClean, error) {
 	var contacts ContactsClean
 
-	_, err := db.Query(&contacts, `SELECT id, firstname, lastname, email FROM contact`)
+	_, err := db.Query(&contacts, `SELECT id, firstname, lastname, email FROM contact order by id desc`)
 
 	if err != nil {
 		return nil, err

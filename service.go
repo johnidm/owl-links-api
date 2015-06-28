@@ -43,10 +43,13 @@ func main() {
 	router.GET("/test", utils.TestRoute)
 
 	router.GET("/links", GetLinks)
+	router.GET("/links/tags", GetLinkTags)
+
 	router.GET("/link/:id", GetLink)
 	router.DELETE("/link/:id", DeleteLink)
 	router.PUT("/link/", PutLink)
 	router.POST("/link", PostLink)
+
 
 	router.GET("/contacts", GetContacts)
 	router.GET("/contact/:id", GetContact)
@@ -90,6 +93,29 @@ func GetLinks(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	utils.DefaultHeader(w)
 	utils.WriteJson(w, js)
+}
+
+func GetLinkTags(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
+	if !utils.APIKeyIsValid(w, r) {
+		return
+	}
+
+	tags, err := controllers.GetLinksTags(collecttion)
+	if err != nil {
+		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.GetLinksTags")
+		return
+	}
+
+	js, err := json.Marshal(tags)
+	if err != nil {
+		utils.DefineReturnRequestError(w, err, "Erro ao fazer o marshal das tags")
+		return
+	}
+
+	utils.DefaultHeader(w)
+	utils.WriteJson(w, js)
+	
 }
 
 func PutLink(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -142,7 +168,17 @@ func PostLink(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		return
 	}
 
+	if (controllers.Exists(collecttion, link.Url)) {
+		utils.DefineReturnErrorHttpRequest(
+			w, 
+			"URL já existe", 
+			"", 
+			400)
+		return
+	}
+
 	err = controllers.CreateLink(&link, collecttion)
+
 	if err != nil {
 		utils.DefineReturnRequestFailExecFunc(w, err, "controllers.CreateLink")
 		return

@@ -26,7 +26,7 @@ func (newsletters *Newsletters) NewRecord() interface{} {
 func GetNewsletters(db *pg.DB) ([]Newsletter, error) {
 	var newsletters Newsletters
 
-	_, err := db.Query(&newsletters, `SELECT id, name, email, subscribe, signedup FROM newsletter`)
+	_, err := db.Query(&newsletters, `SELECT id, name, email, subscribe, signedup FROM newsletter order by id desc`)
 
 	if err != nil {
 		return nil, err
